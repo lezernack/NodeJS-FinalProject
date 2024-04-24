@@ -1,10 +1,8 @@
-const express = require("experss");
+const express = require("express");
 const app = express();
 
 const PORT = 3000;
 
-app.use(PORT);
+app.use("/", require("./routes/connect"));
 
-app.listen(PORT, (req, res) => {
-  console.log(`listening on port ${PORT}`);
-});
+app.listen(PORT, console.log(`listening on port: ${PORT}`));
