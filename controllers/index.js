@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const mainFunction = async (req, res) => {
   res.send(
     "Hello, this is the default message! To get the secret path put /secret at the end of the link"
