@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const mongodb = require("../db/connect");
+const ObjectId = require("mongodb").ObjectId;
 
 const mainFunction = async (req, res) => {
   res.send(
@@ -10,7 +12,19 @@ const secretFunction = async (req, res) => {
   res.send("Hello you've found the secret path!");
 };
 
-// Create college
+const getColleges = async (req, res) => {
+  try {
+    const result = await mongodb.getDb().db().collections("colleges").find();
+    result.toArray().then((lists) => {
+      res.setHeader("Content-Type", "application/json");
+      res.status(200).json(lists);
+    });
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+// Create a college
 const createCollege = async (req, res) => {
   try {
     const college = {
@@ -36,4 +50,63 @@ const createCollege = async (req, res) => {
   }
 };
 
-module.exports = { mainFunction, secretFunction };
+// update a college
+const updateCollege = async (req, res) => {
+  try {
+    const userId = new ObjectId(req.params.id);
+    const college = {
+      college: req.body.college,
+      state: req.body.state,
+      ranking: req.body.ranking,
+    };
+
+    const response = await mongodb
+      .getDb()
+      .db()
+      .collection("colleges")
+      .replaceOne({ _id: userId }, college);
+    if (response.ackknowledged) {
+      res.status(204).json(response);
+    } else {
+      res
+        .status(500)
+        .json(
+          response.error || "Some error occurred while updating the ranking"
+        );
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+// delete one student
+const deleteCollege = async (req, res) => {
+  try {
+    const userId = new ObjectId(req.params.id);
+    const response = await mongodb
+      .getDb()
+      .db()
+      .collection("colleges")
+      .deleteOne({ _id: userId }, true);
+    console.log(response);
+    if (response.ackknowledged) {
+      res.status(200).send(response);
+    } else {
+      res
+        .status(500)
+        .json(
+          response.error || "Some error occurred while deleting the college."
+        );
+    }
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+module.exports = {
+  mainFunction,
+  secretFunction,
+  createCollege,
+  updateCollege,
+  deleteCollege,
+  getColleges,
+};
