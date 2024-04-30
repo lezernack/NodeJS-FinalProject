@@ -14,7 +14,11 @@ const secretFunction = async (req, res) => {
 
 const getColleges = async (req, res) => {
   try {
-    const result = await mongodb.getDb().db().collections("colleges").find();
+    const result = await mongodb
+      .getDb()
+      .db()
+      .collections("colleges")
+      .find("colleges");
     result.toArray().then((lists) => {
       res.setHeader("Content-Type", "application/json");
       res.status(200).json(lists);
